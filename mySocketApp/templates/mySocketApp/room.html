@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+
+    <script src="https://kit.fontawesome.com/9b14acff90.js" crossorigin="anonymous"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+        body{
+            margin: 0;
+        }
+        *{
+            font-family: 'Nunito', sans-serif;
+        }
+
+        #wrapper{
+            height: 100vh;
+            width: 100%;
+            max-width: 1000px;
+
+            margin: auto;
+
+            position: relative;
+        }
+
+        #chat-log{
+            overflow-y: scroll;
+
+            height: calc(100vh - 150px);
+        }
+        #chat-log .message{
+            background-color: rgb(255, 224, 228);
+
+            border-radius: 10px 10px 10px 0;
+
+            padding: 15px;
+
+            width: max-content;
+        }
+        #chat-log .message:nth-child(2n){
+            border-radius: 10px 10px 10px 0;
+        }
+
+        #form{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            width: 100%;
+
+            position: absolute;
+            bottom: 0;
+
+            margin-bottom: 25px;
+        }
+
+        #chat-message-input{
+            width: 80%;
+            height: 100px;
+        }
+
+        #chat-message-submit{
+            height: 75px;
+            width: 75px;
+
+            border-radius: 75px;
+
+            border: none;
+
+            background-color: deeppink;
+            color: white;
+
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="chat-log">
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="message">{{message.text}}</p>
+                {%endfor%}
+            {%endif%}
+        </div>
+        <div id="form">
+            <textarea id="chat-message-input"></textarea>
+            <button id="chat-message-submit"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+    
+    
+    {{ room_name|json_script:"room-name" }}
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/mySocketApp/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            let p = document.createElement('p');
+            p.textContent=data.message;
+            p.classList.add('message');
+            document.querySelector('#chat-log').appendChild(p);
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+    </script>
+</body>
+</html>

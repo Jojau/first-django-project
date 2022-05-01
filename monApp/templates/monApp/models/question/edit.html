@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poser une question</title>
+</head>
+<body>
+    <h1>Poser une question</h1>
+    <form action="{% url 'monApp:updateQuestion' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{question.id}}">
+        <label for="text">
+            Votre question :
+            <input type="text" name="text" id="text" value="{{question.text}}">
+        </label>
+        <button type="submit">Modifie ta question</button>
+    </form>
+</body>
+</html>
