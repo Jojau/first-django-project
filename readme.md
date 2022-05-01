@@ -1,5 +1,5 @@
 # Mon premier projet Django
-# Installation
+## Installation
 Copiez ce dossier sur votre machine, ouvrez votre terminal à la racine du dossier et exécutez la commande suivante (peut varier en fonction de la version de python installée sur votre machine) :
 
 ``py manage.py runserver``
